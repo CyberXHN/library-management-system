@@ -120,8 +120,12 @@ public class ReaderAddDialog extends JDialog {
         }
 
         if (reader == null) {
-            // 新增：id=0 由数据库自增
-            Reader r = new Reader(0, name, sex, tel, cardNo);
+            // 新增：id 默认 0，由数据库自增；契约实体仅有无参构造，用 setter 装配
+            Reader r = new Reader();
+            r.setName(name);
+            r.setSex(sex);
+            r.setTel(tel);
+            r.setCardNo(cardNo);
             readerDao.saveList(Collections.singletonList(r));
         } else {
             // 编辑：保留原 id，整条记录覆盖写
