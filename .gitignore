@@ -1,0 +1,27 @@
+# ===== 内部规划文档（本地资料，不入库）=====
+plans/
+
+# ===== Java 编译产物 =====
+*.class
+bin/
+build/
+out/
+target/
+
+# ===== IDE =====
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+*.launch
+
+# ===== 系统文件 =====
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ===== 运行时产物 =====
+backup.dat
+*.log
