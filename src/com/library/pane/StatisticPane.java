@@ -1,7 +1,7 @@
 package com.library.pane;
 
 import com.library.dao.BorrowDao;
-import com.library.dao.BorrowDaoFactory;
+import com.library.util.BorrowDaoFactory;
 import com.library.entity.Borrow;
 import javax.swing.*;
 import java.awt.*;
@@ -40,7 +40,7 @@ public class StatisticPane extends JPanel {
                 overdueNum++;
             }
             //借阅排行，按书名分组计数
-            String bookName = borrow.getBookName();
+            String bookName = borrow.getBook().getName();
             bookBorrowRank.put(bookName, bookBorrowRank.getOrDefault(bookName,0)+1);
         }
 
