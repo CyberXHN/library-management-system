@@ -8,7 +8,7 @@ import com.library.dao.BorrowDao;
 public class BorrowDaoFactory {
 
     public static BorrowDao getDao() {
-        // 契约层占位：D 完成 BorrowDaoImpl 后，集成时由 A 改为 return new BorrowDaoImpl();
-        throw new UnsupportedOperationException("BorrowDaoImpl 尚未实现（负责人：D）");
+        // 契约层占位：D 完成 BorrowDaoImpl.java 后，集成时由 A 改为 return new BorrowDaoImpl.java();
+        throw new UnsupportedOperationException("BorrowDaoImpl.java 尚未实现（负责人：D）");
     }
 }
