@@ -14,18 +14,22 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import com.library.pane.BookManagePane;
+import com.library.pane.CategoryManagePane;
+import com.library.pane.ReaderManagePane;
+
 /**
  * 系统主界面（负责人：A）
  *
  * 教材同款结构：顶部菜单栏 + 中央 panel 切换（removeAll → add → validate → repaint），
  * 窗口规格按契约 1024×728，居中显示。
  *
- * 各菜单项目前挂占位面板，第 2–3 周集成各成员的 Pane 类（契约第五节归属表）：
- *   读者信息管理 → ReaderManagePane（B）
- *   分类管理 / 图书管理 → CategoryManagePane / BookManagePane（C）
- *   借书 / 还书 → BorrowPane / ReturnPane（D）
- *   借阅统计 → StatisticPane（E）
- *   数据备份 / 数据恢复 → BackupUtil（E，第 4 周集成）
+ * 已集成 B/C 交付的面板；借还（D）、统计与备份恢复（E）暂挂占位，待交付后接入：
+ *   读者信息管理 → ReaderManagePane（B，已集成）
+ *   分类管理 / 图书管理 → CategoryManagePane / BookManagePane（C，已集成）
+ *   借书 / 还书 → BorrowPane / ReturnPane（D，占位待集成）
+ *   借阅统计 → StatisticPane（E，占位待集成）
+ *   数据备份 / 数据恢复 → BackupUtil（E，占位待集成）
  */
 public class MainFrame extends JFrame {
 
@@ -99,24 +103,24 @@ public class MainFrame extends JFrame {
         readerManage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO 集成（B）：换成 new ReaderManagePane()
-                switchPanel(buildPlaceholder("读者管理（成员 B 开发中，第 2-3 周集成）"));
+                // 集成（B）：读者信息管理面板
+                switchPanel(new ReaderManagePane());
             }
         });
 
         categoryManage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO 集成（C）：换成 new CategoryManagePane()
-                switchPanel(buildPlaceholder("分类管理（成员 C 开发中，第 2-3 周集成）"));
+                // 集成（C）：分类管理面板
+                switchPanel(new CategoryManagePane());
             }
         });
 
         bookManage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO 集成（C）：换成 new BookManagePane()
-                switchPanel(buildPlaceholder("图书管理（成员 C 开发中，第 2-3 周集成）"));
+                // 集成（C）：图书管理面板
+                switchPanel(new BookManagePane());
             }
         });
 
