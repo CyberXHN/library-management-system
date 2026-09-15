@@ -62,19 +62,8 @@ public class ReturnPane extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        btnReturn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                doReturn();
-            }
-        });
-
-        btnRefresh.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loadBorrowingList();
-            }
-        });
+        btnReturn.addActionListener(e -> doReturn());
+        btnRefresh.addActionListener(e -> loadBorrowingList());
     }
 
     /** 加载未归还借阅记录 */
@@ -93,7 +82,7 @@ public class ReturnPane extends JPanel {
                     b.getBorrowNo(),
                     b.getReader() != null ? b.getReader().getName() : "",
                     b.getReader() != null ? b.getReader().getCardNo() : "",
-                    b.getBook() != null ? b.getBook().getTitle() : "",
+                    b.getBook() != null ? b.getBook().getName() : "",
                     b.getBorrowDate() != null ? sdf.format(b.getBorrowDate()) : "",
                     b.getDueDate() != null ? sdf.format(b.getDueDate()) : "",
                     b.getStatus()
@@ -111,7 +100,6 @@ public class ReturnPane extends JPanel {
         }
         Borrow borrow = borrowingList.get(selectedRow);
 
-        // 计算逾期天数和罚款
         Date today = new Date();
         long diffMs = today.getTime() - borrow.getDueDate().getTime();
         long overdueDays = diffMs / (1000 * 60 * 60 * 24);
@@ -120,13 +108,12 @@ public class ReturnPane extends JPanel {
             fine = overdueDays * DAILY_FINE;
         }
 
-        // 弹窗确认
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String msg = String.format(
                 "借阅单号：%s\n读者：%s\n书名：%s\n应还日期：%s\n逾期天数：%d 天\n应缴罚款：%.2f 元\n\n确认还书？",
                 borrow.getBorrowNo(),
                 borrow.getReader() != null ? borrow.getReader().getName() : "",
-                borrow.getBook() != null ? borrow.getBook().getTitle() : "",
+                borrow.getBook() != null ? borrow.getBook().getName() : "",
                 borrow.getDueDate() != null ? sdf.format(borrow.getDueDate()) : "",
                 Math.max(overdueDays, 0),
                 fine
@@ -137,7 +124,6 @@ public class ReturnPane extends JPanel {
             return;
         }
 
-        // 更新借阅记录
         BorrowDao borrowDao = BorrowDaoFactory.getDao();
         boolean ret = borrowDao.returnBook(borrow.getId(), fine);
         if (!ret) {
@@ -145,7 +131,6 @@ public class ReturnPane extends JPanel {
             return;
         }
 
-        // 恢复图书库存
         if (borrow.getBook() != null) {
             BookDao bookDao = BookDaoFactory.getDao();
             bookDao.updateStock(borrow.getBook().getId(), 1);

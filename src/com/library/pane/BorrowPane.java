@@ -3,7 +3,6 @@ package com.library.pane;
 import com.library.dao.BookDao;
 import com.library.dao.BorrowDao;
 import com.library.dao.ReaderDao;
-import com.library.dao.impl.BorrowDaoImpl;
 import com.library.entity.Book;
 import com.library.entity.Borrow;
 import com.library.entity.Reader;
@@ -91,33 +90,10 @@ public class BorrowPane extends JPanel {
         add(bottomPanel, BorderLayout.SOUTH);
 
         // 事件绑定
-        btnCheckReader.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                checkReader();
-            }
-        });
-
-        btnSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                searchBooks();
-            }
-        });
-
-        btnBorrow.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                doBorrow();
-            }
-        });
-
-        btnReset.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                resetForm();
-            }
-        });
+        btnCheckReader.addActionListener(e -> checkReader());
+        btnSearch.addActionListener(e -> searchBooks());
+        btnBorrow.addActionListener(e -> doBorrow());
+        btnReset.addActionListener(e -> resetForm());
     }
 
     /** 校验读者 */
@@ -152,7 +128,7 @@ public class BorrowPane extends JPanel {
         for (Book book : currentBookList) {
             Object[] row = {
                     book.getId(),
-                    book.getTitle(),
+                    book.getName(),
                     book.getAuthor(),
                     book.getIsbn(),
                     book.getStock()
@@ -174,7 +150,6 @@ public class BorrowPane extends JPanel {
         }
         Book selectedBook = currentBookList.get(selectedRow);
 
-        // 扣库存（调用 BookDao，不直接操作 book 表）
         BookDao bookDao = BookDaoFactory.getDao();
         boolean stockOk = bookDao.updateStock(selectedBook.getId(), -1);
         if (!stockOk) {
@@ -182,20 +157,16 @@ public class BorrowPane extends JPanel {
             return;
         }
 
-        // 组装借阅记录
-        BorrowDaoImpl borrowDaoImpl = new BorrowDaoImpl();
         Borrow borrow = new Borrow();
-        borrow.setBorrowNo(borrowDaoImpl.generateBorrowNo());
         borrow.setReader(currentReader);
         borrow.setBook(selectedBook);
         borrow.setBorrowDate(new Date());
-        // 应还日期 = 当前 + 30天
         long dueTime = System.currentTimeMillis() + 30L * 24 * 60 * 60 * 1000;
         borrow.setDueDate(new Date(dueTime));
         borrow.setFine(0);
         borrow.setStatus("借出");
 
-        // 插入借阅记录
+        // 使用工厂获取DAO，不再直接new实现类；借阅单号由DAO内部生成
         BorrowDao borrowDao = BorrowDaoFactory.getDao();
         boolean res = borrowDao.addBorrow(borrow);
         if (res) {
@@ -204,7 +175,6 @@ public class BorrowPane extends JPanel {
                             "\n应还日期：" + borrow.getDueDate());
             searchBooks();
         } else {
-            // 回滚库存
             bookDao.updateStock(selectedBook.getId(), 1);
             JOptionPane.showMessageDialog(this, "借书失败，请重试！");
         }
