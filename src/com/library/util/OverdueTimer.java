@@ -1,30 +1,38 @@
 package com.library.util;
 
-import javax.swing.*;
+import com.library.dao.BorrowDao;
+import com.library.entity.Borrow;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.List;
 
 public class OverdueTimer {
+    private static Timer timer;
 
-    private Timer timer;
-
-    public void start() {
+    // 契约入口：public static void start()
+    public static void start() {
         timer = new Timer();
+        // 每60秒执行一次
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                try {
-                    // 逾期扫描逻辑暂未实现，等待 DAO 接口完成后再接入
-                } catch (Exception e) {
-                    SwingUtilities.invokeLater(() -> {
-                        JOptionPane.showMessageDialog(null, "逾期扫描异常：" + e.getMessage());
-                    });
+                BorrowDao borrowDao = BorrowDaoFactory.getDao();
+                List<Borrow> borrowList = borrowDao.getBorrowingList();
+                Date now = new Date();
+
+                for (Borrow borrow : borrowList) {
+                    // 判断：截止日期早于当前时间 → 逾期
+                    if (borrow.getDueDate().before(now)) {
+                        borrow.setStatus("逾期");
+                        borrowDao.update(borrow);
+                    }
                 }
             }
-        }, 0, 1000 * 60 * 30);
+        }, 0, 1000 * 60);
     }
 
-    public void stopCheck() {
+    public static void stop() {
         if (timer != null) {
             timer.cancel();
         }

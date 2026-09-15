@@ -1,42 +1,21 @@
 package com.library.util;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.List;
 
 public class BackupUtil {
-
-    private static final String BACKUP_DIR = "backup/";
-  
-
-    static {
-        try {
-            Files.createDirectories(Paths.get(BACKUP_DIR));
-        } catch (IOException e) {
-            e.printStackTrace();
+    // 契约要求：backup(File file, List<?> list)
+    public static void backup(File file, List<?> list) throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+            oos.writeObject(list);
         }
     }
 
-    public static void backupFile(String srcPath) {
-        File src = new File(srcPath);
-        if (!src.exists()) return;
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        String time = sdf.format(new Date());
-        String destPath = BACKUP_DIR + src.getName() + "_" + time;
-
-        try (InputStream in = new FileInputStream(src);
-             OutputStream out = new FileOutputStream(destPath)) {
-
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) != -1) {
-                out.write(buf, 0, len);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    // 契约要求：restore(File file) 返回List
+    @SuppressWarnings("unchecked")
+    public static <T> List<T> restore(File file) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            return (List<T>) ois.readObject();
         }
     }
 }
