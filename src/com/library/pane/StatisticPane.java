@@ -35,17 +35,16 @@ public class StatisticPane extends JPanel {
         Map<String, Integer> bookBorrowRank = new HashMap<>();
 
         for(Borrow borrow : borrowList){
-            //统计逾期
             if("逾期".equals(borrow.getStatus())){
                 overdueNum++;
             }
-            //借阅排行，按书名分组计数
-            String bookName = borrow.getBook().getName();
+            //空保护，防止borrow.getBook()为null空指针
+            String bookName = borrow.getBook() == null ? "无书籍" : borrow.getBook().getName();
             bookBorrowRank.put(bookName, bookBorrowRank.getOrDefault(bookName,0)+1);
         }
 
         lblBorrowCount.setText("借阅总数：" + total);
         lblOverdueCount.setText("逾期数量：" + overdueNum);
-        // bookBorrowRank 这个Map就是借阅排行，你后续可以放到表格展示
+        //借阅排行表格后续迭代实现
     }
 }
