@@ -1,12 +1,12 @@
 package com.library.pane;
 
 import com.library.dao.BookDao;
-import com.library.dao.BookDaoImpl;
 import com.library.dao.CategoryDao;
-import com.library.dao.CategoryDaoImpl;
 import com.library.entity.Book;
 import com.library.entity.Category;
 import com.library.util.BaseTableModel;
+import com.library.util.BookDaoFactory;
+import com.library.util.CategoryDaoFactory;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -27,13 +27,13 @@ import java.util.List;
  * 功能：分类的增删改查（图书分类管理界面）
  * 依赖说明：
  *   1. BaseTableModel 由 E 负责实现，尚未推送；E 完成后本文件即可编译；
- *   2. 本面板直接 new 自己的 DAO 实现（工厂是 A 的占位，集成时由 A 统一改走 CategoryDaoFactory.getDao()）；
+ *   2. 集成完成：本面板统一走 CategoryDaoFactory / BookDaoFactory 获取 DAO（A 负责回填）；
  *   3. 删除分类前调用 BookDao 接口检查是否有图书引用（跨模块只调 DAO 接口，契约第七节口径）。
  */
 public class CategoryManagePane extends JPanel {
 
-    private CategoryDao categoryDao = new CategoryDaoImpl();
-    private BookDao bookDao = new BookDaoImpl();
+    private CategoryDao categoryDao = CategoryDaoFactory.getDao();
+    private BookDao bookDao = BookDaoFactory.getDao();
 
     private BaseTableModel<Category> tableModel;
     private JTable table;
