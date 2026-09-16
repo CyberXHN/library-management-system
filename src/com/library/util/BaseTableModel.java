@@ -5,46 +5,51 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 public class BaseTableModel<T> extends AbstractTableModel {
-    private final List<T> dataList;
-    private final String[] columnProps;
-    private final String[] columnNames;
+    private List<T> dataList;
+    private final String[] columns;
+    private final String[] props;
 
-    public BaseTableModel(List<T> dataList, String[] columnProps, String[] columnNames) {
+    // 【严格还原原始契约顺序】(list, columns, props)，禁止调换顺序！
+    public BaseTableModel(List<T> dataList, String[] columns, String[] props) {
         this.dataList = dataList;
-        this.columnProps = columnProps;
-        this.columnNames = columnNames;
+        this.columns = columns;
+        this.props = props;
     }
 
     @Override
     public int getRowCount() {
+        // 恢复null保护，防止dataList为null空指针
+        if(dataList == null){
+            return 0;
+        }
         return dataList.size();
     }
 
     @Override
     public int getColumnCount() {
-        return columnNames.length;
+        return columns.length;
     }
 
     @Override
     public String getColumnName(int column) {
-        return columnNames[column];
+        return columns[column];
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         T item = dataList.get(rowIndex);
-        String propPath = columnProps[columnIndex];
+        String propPath = props[columnIndex];
         return getNestedValue(item, propPath);
     }
 
-    // 核心新增：支持嵌套属性，例如 "book.category.name"
+    // 新增：嵌套属性解析，支持 category.name / book.category.name
     private Object getNestedValue(Object rootObj, String propPath) {
         if (rootObj == null || propPath == null || propPath.isBlank()) {
             return null;
         }
-        String[] props = propPath.split("\\.");
+        String[] propsSplit = propPath.split("\\.");
         Object current = rootObj;
-        for (String prop : props) {
+        for (String prop : propsSplit) {
             if (current == null) {
                 return null;
             }
@@ -57,6 +62,20 @@ public class BaseTableModel<T> extends AbstractTableModel {
             }
         }
         return current;
+    }
+
+    // 【恢复原有方法，B/C模块依赖，绝对不能删！】
+    public void setList(List<T> newList) {
+        this.dataList = newList;
+        fireTableDataChanged();
+    }
+
+    // 【恢复原有getRow方法】
+    public T getRow(int rowIndex) {
+        if(dataList == null || rowIndex <0 || rowIndex >= dataList.size()){
+            return null;
+        }
+        return dataList.get(rowIndex);
     }
 
     public List<T> getDataList() {
