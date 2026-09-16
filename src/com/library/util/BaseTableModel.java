@@ -5,29 +5,19 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 public class BaseTableModel<T> extends AbstractTableModel {
-    private List<T> dataList;
-    private String[] columnNames;
-    private String[] props;
+    private final List<T> dataList;
+    private final String[] columnProps;
+    private final String[] columnNames;
 
-    // 契约要求：三参数构造器 list, columns, props
-    public BaseTableModel(List<T> dataList, String[] columnNames, String[] props) {
+    public BaseTableModel(List<T> dataList, String[] columnProps, String[] columnNames) {
         this.dataList = dataList;
+        this.columnProps = columnProps;
         this.columnNames = columnNames;
-        this.props = props;
-    }
-
-    public void setList(List<T> newList) {
-        this.dataList = newList;
-        fireTableDataChanged();
-    }
-
-    public T getRow(int rowIndex) {
-        return dataList.get(rowIndex);
     }
 
     @Override
     public int getRowCount() {
-        return dataList == null ? 0 : dataList.size();
+        return dataList.size();
     }
 
     @Override
@@ -40,17 +30,36 @@ public class BaseTableModel<T> extends AbstractTableModel {
         return columnNames[column];
     }
 
-    // 反射取值，契约要求
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         T item = dataList.get(rowIndex);
-        String fieldName = props[columnIndex];
-        try {
-            Field field = item.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(item);
-        } catch (Exception e) {
-            return "";
+        String propPath = columnProps[columnIndex];
+        return getNestedValue(item, propPath);
+    }
+
+    // 核心新增：支持嵌套属性，例如 "book.category.name"
+    private Object getNestedValue(Object rootObj, String propPath) {
+        if (rootObj == null || propPath == null || propPath.isBlank()) {
+            return null;
         }
+        String[] props = propPath.split("\\.");
+        Object current = rootObj;
+        for (String prop : props) {
+            if (current == null) {
+                return null;
+            }
+            try {
+                Field field = current.getClass().getDeclaredField(prop);
+                field.setAccessible(true);
+                current = field.get(current);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                return null;
+            }
+        }
+        return current;
+    }
+
+    public List<T> getDataList() {
+        return dataList;
     }
 }
