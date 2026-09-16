@@ -1,7 +1,7 @@
 package com.library.pane;
 
 import com.library.dao.BorrowDao;
-import com.library.dao.BorrowDaoFactory;
+import com.library.util.BorrowDaoFactory;
 import com.library.entity.Borrow;
 import javax.swing.*;
 import java.awt.*;
@@ -35,17 +35,16 @@ public class StatisticPane extends JPanel {
         Map<String, Integer> bookBorrowRank = new HashMap<>();
 
         for(Borrow borrow : borrowList){
-            //统计逾期
             if("逾期".equals(borrow.getStatus())){
                 overdueNum++;
             }
-            // ✅修复：空值保护，book为null时显示“无书籍”，防止空指针
+            //空保护，防止borrow.getBook()为null空指针
             String bookName = borrow.getBook() == null ? "无书籍" : borrow.getBook().getName();
             bookBorrowRank.put(bookName, bookBorrowRank.getOrDefault(bookName,0)+1);
         }
 
         lblBorrowCount.setText("借阅总数：" + total);
         lblOverdueCount.setText("逾期数量：" + overdueNum);
-        // bookBorrowRank 借阅排行Map，表格展示后续迭代实现
+        //借阅排行表格后续迭代实现
     }
 }
