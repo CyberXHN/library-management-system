@@ -1,5 +1,7 @@
 package com.library.frame;
 
+import com.library.util.OverdueTimer;
+
 /**
  * 程序入口（负责人：A）
  *
@@ -9,8 +11,8 @@ package com.library.frame;
 public class MainLibrary {
 
     public static void main(String[] args) {
-        // TODO 集成（E）：OverdueTimer 交付后取消注释（成员 E 负责，第 3 周）
-        // OverdueTimer.start();
+        // 集成（E）：启动逾期检测后台线程（每 60 秒扫描一次未还记录）
+        OverdueTimer.start();
         new LoginFrame();
     }
 }

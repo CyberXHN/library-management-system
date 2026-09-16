@@ -1,10 +1,10 @@
 package com.library.pane;
 
 import com.library.dao.BookDao;
-import com.library.dao.BookDaoImpl;
 import com.library.dialog.BookAddDialog;
 import com.library.entity.Book;
 import com.library.util.BaseTableModel;
+import com.library.util.BookDaoFactory;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -25,12 +25,12 @@ import java.util.List;
  * 功能：图书的增删改查、模糊检索、上下架管理
  * 依赖说明：
  *   1. BaseTableModel 由 E 负责实现，尚未推送；E 完成后本文件即可编译；
- *   2. 本面板直接 new 自己的 DAO 实现（工厂是 A 的占位，集成时由 A 统一改走 BookDaoFactory.getDao()）；
+ *   2. 集成完成：本面板统一走 BookDaoFactory 获取 DAO（A 负责回填）；
  *   3. 图书新增/编辑弹窗见 BookAddDialog（同属模块3）。
  */
 public class BookManagePane extends JPanel {
 
-    private BookDao bookDao = new BookDaoImpl();
+    private BookDao bookDao = BookDaoFactory.getDao();
 
     private BaseTableModel<Book> tableModel;
     private JTable table;
