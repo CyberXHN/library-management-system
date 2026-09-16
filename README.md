@@ -235,12 +235,8 @@ lib/               MySQL 驱动 jar（mysql-connector-j-8.0.33.jar，已入库�
 
 | 模块 | 问题 | 影响 |
 |---|---|---|
-| 统计/工具（E） | `BaseTableModel` 目前用 `getDeclaredField(prop)` 取值，**不支持 `category.name` 嵌套属性** | 图书管理面板"分类"列显示空白 |
-| 统计/工具（E） | `OverdueTimer` 用 `dueDate.before(now)` 判逾期，**到期当天 0 点即标"逾期"**（与还书罚款口径差 1 天）；已逾期记录每 60 秒重复 update；无界面弹窗提醒 | 状态与罚款口径不完全一致 |
-| 统计/工具（E） | `StatisticPane` 只显示两个计数标签，借阅排行 `Map` 未落到表格；`borrow.getBook().getName()` 无空值保护 | 统计模块功能不完整 |
-| 统计/工具（E） | `BackupUtil` 实际签名为 `backup(File, List<?>)` / `restore(File)`，与《接口契约》的 `String` 参数写法不一致 | 需走契约变更流程对齐 |
-| 借阅（D） | 借阅单号实际生成 `JY + yyyyMMdd + 4 位`，与契约口径（无 `JY` 前缀）及演示数据不一致；序号用 `COUNT(*)` 生成，并发下有唯一键冲突风险 | 单号格式不统一 |
-| 图书（C） | `BookAddDialog` 仍直接 `new BookDaoImpl()/new CategoryDaoImpl()`，未走工厂 | 架构一致性小瑕疵 |
+| 统计/工具（E） | `OverdueTimer` 仍以 `dueDate` 与当前时刻直接比较判逾期，**到期当天即被标“逾期”**（与还书罚款口径差 1 天）；且无界面弹窗提醒 | 状态与罚款口径不完全一致 |
+| 统计/工具（E） | `StatisticPane` 只显示借阅总数 / 逾期数两个计数标签，**借阅排行 `Map` 仍未落到表格展示** | 统计模块功能不完整 |
 
 > 接口契约的正式版见 `docs/图书管理系统-接口契约.md`，实体字段 / DAO 签名 / 表结构**冻结**，任何修改需"全组同意 → 更新契约 → 群通知"。
 
